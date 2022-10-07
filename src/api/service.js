@@ -28,3 +28,11 @@ export function delAdminUser(data, callback) {
 export function usersList(data, callback) {
   POST(api.usersList, data, callback);
 }
+
+export function getPro(data, callback) {
+  POST(api.getPro, data, callback);
+}
+
+export function getAllProType(callback) {
+  GET(api.getAllProType, callback);
+}

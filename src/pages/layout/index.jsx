@@ -1,11 +1,10 @@
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  UploadOutlined,
+  DesktopOutlined,
   UserOutlined,
-  VideoCameraOutlined,
   DownOutlined,
-  SmileOutlined,
+  ShopOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu, Avatar, Dropdown, Space } from "antd";
 import { Outlet, useNavigate, Link } from "react-router-dom";
@@ -60,7 +59,7 @@ const Layouts = ({user,dispatch}) => {
           items={[
             {
               key: "1",
-              icon: <UserOutlined />,
+              icon: <DesktopOutlined />,
               label: <Link to="/">首页</Link>,
             },
             {
@@ -72,6 +71,11 @@ const Layouts = ({user,dispatch}) => {
               key: "3",
               icon: <UserOutlined />,
               label: <Link to="/users">会员管理</Link>,
+            },
+            {
+              key: "4",
+              icon: <ShopOutlined />,
+              label: <Link to="/product">商品管理</Link>,
             },
           ]}
         />
