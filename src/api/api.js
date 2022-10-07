@@ -8,4 +8,5 @@ const api = {
   delAdminUser: `${url}dapi/vapi/delAdminUser`,
   usersList: `${url}dapi/vapi/usersList`,
 };
+export const staticUrl = "http://8i98.com/apidoc/";
 export default api;

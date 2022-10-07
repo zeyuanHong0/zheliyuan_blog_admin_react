@@ -70,8 +70,8 @@ const Layouts = ({user,dispatch}) => {
             },
             {
               key: "3",
-              icon: <UploadOutlined />,
-              label: "nav 3",
+              icon: <UserOutlined />,
+              label: <Link to="/users">会员管理</Link>,
             },
           ]}
         />
