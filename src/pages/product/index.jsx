@@ -6,6 +6,7 @@ import {
     Form,
     Input,
     Select,
+    message,
     Popconfirm,
     Row,
     Col,
@@ -14,17 +15,22 @@ import {
 import { formatDate } from "../../util/tool";
 import {
     getPro,
-    getAllProType
+    getAllProType,
+    addpro,
+    getDetail,
+    updatepro,
 } from "../../api/service";
+import Uploadimg from "../../components/uploadImg"; //图片上传组件
+import MyEditor from "../../components/wangEditor"; // 富文本编辑器
 import { staticUrl } from "../../api/api";
 
 
 const initState = {
     page: 1,
-    pageSize:10,
+    pageSize: 10,
     orderbytype: 'id',
     key: '',
-    total:0,
+    total: 0,
     data: [],
     isModalOpen: false,
     typeData: [],//商品分类数据
@@ -32,6 +38,8 @@ const initState = {
     type2SelectId: '',
     mainSelectId: '',
     secondSelectId: '',
+    imgList: '', // 商品主图列表
+    html: "", // 富文本编辑器内容
 
 };
 
@@ -154,7 +162,7 @@ function Product() {
     // 获取商品列表
     useEffect(function () {
         init();
-        console.log(state.data)
+        // console.log(state.data)
     }, [state.type2SelectId, state.page]);
     const init = () => {
         getPro({
@@ -167,29 +175,64 @@ function Product() {
                 data: res.data[0].data,
                 total: res.data[0].data[0].total,
             });
-            
-        });
-    };
-    // 点击显示修改用户信息的弹窗并把输入填充到form表单
-    const onUpdate = (row) => {
-        form.setFieldsValue({
 
         });
-        dispatch({
-            isModalOpen: true,
-            id: row.id,
-        });
     };
+
+    // 点击显示修改用户信息的弹窗并把输入填充到form表单
+    const onUpdate = (row) => {
+        getDetail({ id: row.id }, res => {
+            const data = res.data[0].data[0]
+            form.setFieldsValue({
+                ...data
+            })
+            // 根据typeid找对应的主分类id,先找二级分类的fatherid，然后取第一个fatherid作为他的主id
+            let fahterIdStr = "";
+            for (let i = 0; i < state.typeData.length; i++) {
+                let item = state.typeData[i];
+                if (item.id === row.typeid) {
+                    fahterIdStr = item.fatherid;
+                    break;
+                }
+            }
+            fahterIdStr = fahterIdStr.split("-")[0];
+
+            dispatch({
+                isModalOpen: true,
+                id: data.id,
+                imgList: data.img,
+                mainSelectId: Number(fahterIdStr),
+                secondSelectId: data.typeid,
+                html: data.detail,
+            })
+        })
+
+    }
+
     // 由于form输入的内容会保留，每次点击添加则要把数据设置为"",需要获取form的实例，调用实例的setFiledsValue方法设置form表单默认值。
     const handleShow = () => {
         form.setFieldsValue({
-
+            title: "",
+            price: "",
+            discount: "",
+            weight: "",
+            stock: "",
+            color: "",
+            brand: "",
+            popular: "",
+            sales: "",
+            typeid: "",
         });
         dispatch({
             isModalOpen: true,
             id: "",
+            mainSelectId: "",
+            secondSelectId: "",
+            imgList: "",
+            html: "",
         });
     };
+
     const handleCancel = () => {
         dispatch({
             isModalOpen: false,
@@ -198,10 +241,40 @@ function Product() {
 
     // 获取表单输入内容，并提交到后端
     const onFinish = (values) => {
-        console.log(values)
-        return
+        if (!state.id) {
+            // 添加商品
+            addpro(
+                {
+                    ...values,
+                    img: state.imgList,
+                    detail: state.html,
+                    typeid: state.secondSelectId,
+                },
+                () => {
+                    init();
+                    message.info("添加成功");
+                    handleCancel();
+                }
+            );
+        } else {
+            updatepro(
+                {
+                    ...values,
+                    img: state.imgList,
+                    detail: state.html,
+                    typeid: state.secondSelectId,
+                    id: state.id,
+                },
+                () => {
+                    init();
+                    message.info("更新成功");
+                    handleCancel();
+                }
+            );
+        }
     };
     const handleSearch = () => { }
+
     // 选择主分类
     const handleType = (key, value) => {
         // console.log(key, value)
@@ -209,6 +282,22 @@ function Product() {
             [key]: value,
         })
     };
+
+    // 子组件传递上传图片数据到父组件的方法
+    const setImgList = (str) => {
+        dispatch({
+            imgList: str
+        })
+    }
+
+    // 富文本组件传递参数给该函数
+    const setEditorHtml = (str) => {
+        console.log(str);
+        dispatch({
+            html: str,
+        });
+    };
+
     return (
         <Fragment>
             <Row style={{ marginBottom: "15px" }}>
@@ -290,6 +379,7 @@ function Product() {
                 open={state.isModalOpen}
                 onCancel={handleCancel}
                 footer={false}
+                width={700}
             >
                 <Form  /* 添加商品的表单 */
                     name="basic"
@@ -305,7 +395,7 @@ function Product() {
                         name="title"
                         rules={[{ required: true, message: "商品名称!" }]}
                     >
-                        <Input disabled={state.id} />
+                        <Input />
                     </Form.Item>
 
                     <Form.Item
@@ -396,8 +486,14 @@ function Product() {
                                 ))}
                         </Select>
                     </Form.Item>
-                    <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                        <Button type="primary" htmlType="submit">
+                    <Form.Item label="主图" name="">
+                        <Uploadimg imgList={state.imgList} setImgList={setImgList} />
+                    </Form.Item>
+                    <div>
+                        <MyEditor htmlCon={state.html} setEditorHtml={setEditorHtml} />
+                    </div>
+                    <Form.Item wrapperCol={{ offset: 8, span: 16 }} >
+                        <Button type="primary" htmlType="submit" style={{ marginLeft: "60px", marginTop: "10px" }}>
                             提交
                         </Button>
                     </Form.Item>
