@@ -19,6 +19,8 @@ import {
     addpro,
     getDetail,
     updatepro,
+    delPro,
+    deldetailimg
 } from "../../api/service";
 import Uploadimg from "../../components/uploadImg"; //图片上传组件
 import MyEditor from "../../components/wangEditor"; // 富文本编辑器
@@ -30,6 +32,7 @@ const initState = {
     pageSize: 10,
     orderbytype: 'id',
     key: '',
+    skey: '',
     total: 0,
     data: [],
     isModalOpen: false,
@@ -53,6 +56,27 @@ const reducer = function (state = initState, action) {
 function Product() {
     const [form] = Form.useForm(); // 创建一个form表单对象,还需要给form赋值具体的表单实例
     const [state, dispatch] = useReducer(reducer, initState);
+
+    // 删除数据
+    const handleDel = (row) => {
+        // 删除商品的同时还需要删除商品对应的图片(主图和详情图片)
+        let arr = [];
+        arr = row.img.split(",");
+        getDetail({ id: row.id }, (res) => { //首先要把图片给删除
+            const data = res.data[0].data[0].detail;
+            // 用正则匹配出所有的图片路径
+            let reg =
+                /(?<=\<img src="https:\/\/8i98\.com\/apidoc\/)vapi\/\d+\/[\w-]+.[A-z]+(?=" alt="" data-href="" style=""\/\>)/g;
+            let imgs = data.match(reg) || [];
+            arr = [...arr, ...imgs];
+            deldetailimg({ file: arr }, () => "");
+
+            delPro({ id: row.id }, (res) => {
+                init();
+                message.info("删除成功")
+            })
+        });
+    };
 
     const columns = [
         {
@@ -138,6 +162,7 @@ function Product() {
                         title="你确定是否要删除?"
                         okText="确认"
                         cancelText="取消"
+                        onConfirm={() => handleDel(record)}
                     >
                         <Button type="danger">删除</Button>
                     </Popconfirm>
@@ -163,7 +188,7 @@ function Product() {
     useEffect(function () {
         init();
         // console.log(state.data)
-    }, [state.type2SelectId, state.page]);
+    }, [state.type2SelectId, state.page, state.key])
     const init = () => {
         getPro({
             page: state.page,
@@ -273,7 +298,11 @@ function Product() {
             );
         }
     };
-    const handleSearch = () => { }
+    const handleSearch = () => {
+        dispatch({
+            key: state.skey,
+        })
+    }
 
     // 选择主分类
     const handleType = (key, value) => {
@@ -309,7 +338,7 @@ function Product() {
                 <Col span={6}>
                     <Input
                         placeholder="输入商品关键词"
-                        onChange={e => dispatch({ key: e.target.value })}
+                        onChange={e => dispatch({ skey: e.target.value })} /* 把搜索框输入的值用skey保存 */
                     />
                 </Col>
                 <Col span={4}>

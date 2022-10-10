@@ -11,6 +11,7 @@ const api = {
   addpro: `${url}dapi/vapi/addpro`,
   getDetail: `${url}dapi/vapi/getDetail`,
   updatepro: `${url}dapi/vapi/updatepro`,
+  delPro: `${url}dapi/vapi/delPro`,
   getAllProType: `${url}dapi/vapi/getAllProType`,
   adddetailimg: `${url}dapi/vapi/adddetailimg`,
   deldetailimg: `${url}dapi/vapi/deldetailimg`,

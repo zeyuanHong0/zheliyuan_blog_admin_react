@@ -41,6 +41,10 @@ export function getPro(data, callback) {
   POST(api.getPro, data, callback);
 }
 
+export function delPro(data, callback) {
+  POST(api.delPro, data, callback);
+}
+
 export function getAllProType(callback) {
   GET(api.getAllProType, callback);
 }
