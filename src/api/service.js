@@ -56,3 +56,11 @@ export function updatepro(data, callback) {
 export function getDetail(data, callback) {
   GET(`${api.getDetail}?id=${data.id}`, callback);
 }
+
+export function getOrdersList(data, callback) {
+  POST(api.getOrdersList, data, callback);
+}
+
+export function updateOrders(data, callback) {
+  POST(api.updateOrders, data, callback);
+}

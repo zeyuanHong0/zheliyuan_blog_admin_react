@@ -2,6 +2,7 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   DesktopOutlined,
+  BarChartOutlined,
   UserOutlined,
   DownOutlined,
   ShopOutlined,
@@ -76,6 +77,11 @@ const Layouts = ({user,dispatch}) => {
               key: "4",
               icon: <ShopOutlined />,
               label: <Link to="/product">商品管理</Link>,
+            },
+            {
+              key: "5",
+              icon: <BarChartOutlined />,
+              label: <Link to="/order">订单管理</Link>,
             },
           ]}
         />
