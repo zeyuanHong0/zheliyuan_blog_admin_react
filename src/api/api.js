@@ -15,6 +15,8 @@ const api = {
   getAllProType: `${url}dapi/vapi/getAllProType`,
   adddetailimg: `${url}dapi/vapi/adddetailimg`,
   deldetailimg: `${url}dapi/vapi/deldetailimg`,
+  getOrdersList: `${url}dapi/vapi/getOrdersList`,
+  updateOrders: `${url}dapi/vapi/updateOrders`,
 };
 export const staticUrl = "http://8i98.com/apidoc/";
 export default api;
