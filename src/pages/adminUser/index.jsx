@@ -8,9 +8,13 @@ import {
   Select,
   message,
   Popconfirm,
+  List,
+  Card,
+  Checkbox,
 } from "antd";
 import { getAdminUserList } from "../../api/service";
 import { formatDate } from "../../util/tool";
+import config from "../../config";
 import {
   addCreateAdminUser,
   updateAdminUser,
@@ -18,7 +22,7 @@ import {
 } from "../../api/service";
 
 const ROLE_MAP = {
-  0: "普通管理员",
+  normal: "普通管理员",
   admin: "超级管理员",
 };
 
@@ -26,6 +30,8 @@ const initState = {
   page: 1,
   data: [],
   isModalOpen: false,
+  role: "normal",
+  authority: config.normal,
   id: "", // 如果id有值则是更新数据，没有值则是添加数据
 };
 
@@ -91,6 +97,7 @@ function Adminuser() {
       ),
     },
   ];
+
   useEffect(function () {
     init();
   }, []);
@@ -102,6 +109,7 @@ function Adminuser() {
       });
     });
   };
+
   // 点击显示修改用户信息的弹窗并把输入填充到form表单
   const onUpdate = (row) => {
     form.setFieldsValue({
@@ -115,6 +123,7 @@ function Adminuser() {
       id: row.id,
     });
   };
+
   // 由于form输入的内容会保留，每次点击添加则要把数据设置为"",需要获取form的实例，调用实例的setFiledsValue方法设置form表单默认值。
   const handleShow = () => {
     form.setFieldsValue({
@@ -128,11 +137,29 @@ function Adminuser() {
       id: "",
     });
   };
+
   const handleCancel = () => {
     dispatch({
       isModalOpen: false,
     });
   };
+
+  const handleChangeRole = (value) => {
+    let obj = {
+      role: value,
+    };
+    // authority 权限如果没有设置，则是等于选择角色的权限，如果设置了authority，则不用管role的权限。
+    if (!state.authority) {
+      obj.authority = config[value];
+    }
+    dispatch(obj);
+  };
+
+  // 修改权限
+  const onChangeAut = (data) => {
+    console.log(data);
+  };
+
   // 获取表单输入内容，并提交到后端
   const onFinish = (values) => {
     if (!state.id) {
@@ -201,18 +228,47 @@ function Adminuser() {
               <Input.Password />
             </Form.Item>
           )}
+
           <Form.Item
             label="角色"
             name="role"
             rules={[{ required: true, message: "请选择角色!" }]}
           >
-            <Select>
+            <Select value={state.role} onChange={handleChangeRole}>
               {Object.keys(ROLE_MAP).map((key) => (
                 <Select.Option key={key} value={key}>
                   {ROLE_MAP[key]}
                 </Select.Option>
               ))}
             </Select>
+          </Form.Item>
+
+          <Form.Item
+            label="权限配置"
+            rules={[{ required: true, message: "请选择角色!" }]}
+          >
+            <List
+              grid={{
+                column: 1,
+              }}
+              dataSource={Object.keys(state.authority)}
+              renderItem={(key) => (
+                <List.Item>
+                  <Card title={state.authority[key].title}>
+                    {Object.keys(state.authority[key])
+                      .filter((item) => item !== "title")
+                      .map((item) => (
+                        <Checkbox
+                          checked={state.authority[key][item]}
+                          onChange={() => onChangeAut()}
+                        >
+                          {item}
+                        </Checkbox>
+                      ))}
+                  </Card>
+                </List.Item>
+              )}
+            />
           </Form.Item>
 
           <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
