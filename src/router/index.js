@@ -8,6 +8,7 @@ import Adminuser from "../pages/adminUser";
 import Users from "../pages/users";
 import Product from "../pages/product";
 import Order from "../pages/orders";
+import Role from "../pages/roleManager";
 import Notfound from "../pages/notfound";
 export default function App() {
   return (
@@ -19,7 +20,8 @@ export default function App() {
           <Route path="adminuser" element={<Adminuser />}></Route>
           <Route path="users" element={<Users />}></Route>
           <Route path="product" element={<Product />}></Route>
-          <Route path="Order" element={<Order />}></Route>
+          <Route path="order" element={<Order />}></Route>
+          <Route path="role" element={<Role />}></Route>
         </Route>
         <Route path="*" element={<Notfound />}></Route>
       </Routes>

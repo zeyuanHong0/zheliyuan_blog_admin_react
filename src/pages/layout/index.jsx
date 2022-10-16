@@ -83,6 +83,11 @@ const Layouts = ({user,dispatch}) => {
               icon: <BarChartOutlined />,
               label: <Link to="/order">订单管理</Link>,
             },
+            {
+              key: "6",
+              icon: <UserOutlined />,
+              label: <Link to="/role">角色管理</Link>,
+            },
           ]}
         />
       </Sider>
